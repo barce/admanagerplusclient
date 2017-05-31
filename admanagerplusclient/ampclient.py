@@ -43,3 +43,8 @@ class BrightRollClient:
     self.one_host = os.environ['BR_ONE_HOST']
 
 
+  def campaigns(self):
+    return True
+
+  def deals(self):
+    return True
