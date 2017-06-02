@@ -60,7 +60,8 @@ class BrightRollClient:
     print(headers)
     # r = requests.post(get_token_url, json=payload, headers=headers)
     r = requests.post(get_token_url, data=payload, headers=headers)
-    return r
+    results_json = r.json()
+    return results_json
 
   def cli_auth_dance(self):
     self.get_yahoo_auth_url()
@@ -70,8 +71,23 @@ class BrightRollClient:
     print("raw_token_results:")
     print(self.raw_token_results)
 
+  # curl -H "Content-Type: application/json" \
+  #   -H "X-Auth-Method: OAUTH" \ 
+  #   -H "X-Auth-Token: ACCESS_TOKEN" \
+  #   https://dspapi.admanagerplus.yahoo.com/traffic/campaigns
+
   def campaigns(self):
-    return True
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    campaigns = requests.get(self.dsp_host + "/traffic/campaigns", headers=headers)
+    return campaigns
 
   def deals(self):
-    return True
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    deals = requests.get(self.dsp_host + "/traffic/deals", headers=headers)
+    return deals
+
+  def advertisers(self):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    advertisers = requests.get(self.dsp_host + "/traffic/advertisers", headers=headers)
+    return advertisers
+
