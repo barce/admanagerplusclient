@@ -94,13 +94,36 @@ class BrightRollClient:
     traffic_types = results.json()
     return traffic_types
     
-  def update_traffic_type(self, s_type, cid, payload):
+  def update_campaign(self, cid, payload):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    r = requests.put(self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid), data=payload, headers=headers)
+    r = requests.put(self.dsp_host + "/traffic/campaigns/" + str(cid), data=payload, headers=headers)
     return r
 
-  def create_traffic_type(self, s_type, payload):
+  def create_campaign(self, payload):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    r = requests.post(self.dsp_host + "/traffic/" + str(s_type) , data=payload, headers=headers)
+    r = requests.post(self.dsp_host + "/traffic/campaigns", data=payload, headers=headers)
     return r
+    
+  #
+  #
+  # deals
+  #
+  #
+  def deals(self):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    results = requests.get(self.dsp_host + "/traffic/deals", headers=headers)
+    deals = results.json()
+    return deals
 
+  #
+  #
+  # deals
+  #
+  #
+  def advertisers(self):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    results = = requests.get(self.dsp_host + "/traffic/advertisers", headers=headers)
+    advertisers = results.json()
+    return advertisers
+
+  
