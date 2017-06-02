@@ -1,18 +1,18 @@
 from distutils.core import setup
 
 setup(
-    name='aopclient',
-    version='0.0.3',
+    name='admanagerplusclient',
+    version='0.0.1',
     author='Jim Barcelona',
     author_email='barce@me.com',
-    packages=['aopclient', 'aopclient.tests'],
+    packages=['admanagerplusclient', 'admanagerplusclient.tests'],
     install_requires=[
       'future',
     ],
     scripts=[],
-    url='http://pypi.python.org/pypi/aopclient/',
+    url='http://pypi.python.org/pypi/admanagerplusclient/',
     license='LICENSE',
-    description='A client for interacting with the AOL Platform.',
+    description='A client for interacting with the Ad Manager Plus Platform.',
     long_description=open('README.txt').read(),
 )
  
