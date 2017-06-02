@@ -1,10 +1,8 @@
 from unittest import TestCase
+from admanagerplusclient import ampclient
 
-import aopclient
-from aopclient import AOLClient
-
-
-class TestAOLClient(TestCase):
+class TestBrightRollClient(TestCase):
     def test_config(self):
-        b = aopclient.AOLClient()
-        self.assertTrue(isinstance(b, AOLClient))
+        b = ampclient.BrightRollClient()
+        self.assertTrue(isinstance(b, amp.BrightRollClient))
+
