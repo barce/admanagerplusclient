@@ -78,16 +78,42 @@ class BrightRollClient:
 
   def campaigns(self):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    campaigns = requests.get(self.dsp_host + "/traffic/campaigns", headers=headers)
+    results = requests.get(self.dsp_host + "/traffic/campaigns", headers=headers)
+    campaigns = results.json()
     return campaigns
 
+  def campaign_by_id(self, cid):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    result = requests.get(self.dsp_host + "/traffic/campaigns/" + str(cid), headers=headers)
+    campaign = result.json()
+    return campaign
+  
+  def campaigns_by_filter(self, account_id, page, limit, sort, direction, query):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    results = requests.get(self.dsp_host + "/traffic/campaigns?accountId=" + str(account_id) + "&page=" + str(page) + "&limit=" + str(limit) + "&sort=" + str(sort) + "&dir=" + str(direction) + "&query=" + str(query), headers=headers)
+    campaigns = results.json()
+    return campaigns
+    
+  def update_campaign(self, cid, payload):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    r = requests.put(self.dsp_host + "/traffic/campaigns/" + str(cid), data=payload, headers=headers)
+    return r
+
+  def create_campaign(self, payload):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    r = requests.post(self.dsp_host + "/traffic/campaigns", data=payload, headers=headers)
+    return r
+    
   def deals(self):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    deals = requests.get(self.dsp_host + "/traffic/deals", headers=headers)
+    results = requests.get(self.dsp_host + "/traffic/deals", headers=headers)
+    deals = results.json()
     return deals
 
   def advertisers(self):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    advertisers = requests.get(self.dsp_host + "/traffic/advertisers", headers=headers)
+    results = = requests.get(self.dsp_host + "/traffic/advertisers", headers=headers)
+    advertisers = results.json()
     return advertisers
 
+  
