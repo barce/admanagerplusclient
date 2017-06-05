@@ -11,6 +11,9 @@ import time
 import os
 import base64
 
+import sys
+# if sys.version_info < (3, 0):
+#     raise "must use python 2.5 or greater"
 
 use_environment_variables = None
 
@@ -65,7 +68,11 @@ class BrightRollClient:
 
   def cli_auth_dance(self):
     self.get_yahoo_auth_url()
-    self.yahoo_auth = raw_input("Enter Yahoo! auth code: ")
+    if sys.version_info < (3, 0):
+      self.yahoo_auth = raw_input("Enter Yahoo! auth code: ")
+    else:
+      self.yahoo_auth = input("Enter Yahoo! auth code: ")
+
     print("Auth code, {}, entered.".format(self.yahoo_auth))
     self.raw_token_results = self.get_access_token_json()
     print("raw_token_results:")
