@@ -57,7 +57,7 @@ class BrightRollClient:
     # payload = {'grant_type':'authorization_code', 'redirect_uri':'oob','code':self.yahoo_auth}
     payload = "grant_type=authorization_code&redirect_uri=oob&code=" + self.yahoo_auth
     # headers = {'Content-Type': 'application/json', 'Authorization': "Basic " + self.base64auth()}
-    headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth()}
+    headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth().decode('utf-8')}
     print(get_token_url)
     print(payload)
     print(headers)
