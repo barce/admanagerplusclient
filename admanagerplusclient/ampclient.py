@@ -50,7 +50,7 @@ class BrightRollClient:
     return self.yahoo_auth
 
   def base64auth(self):
-    return base64.b64encode(self.client_id + ":" + self.client_secret)
+    return base64.b64encode((self.client_id + ":" + self.client_secret).encode())
     
   def get_access_token_json(self):
     get_token_url = self.id_host + "/oauth2/get_token"
