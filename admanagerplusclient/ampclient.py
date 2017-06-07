@@ -66,6 +66,15 @@ class BrightRollClient:
     results_json = r.json()
     return results_json
 
+  def refresh_access_token(self):
+    get_token_url = self.id_host + "/oauth2/get_token"
+    payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results['refresh_token'].encode('utf-8')
+    headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth().decode('utf-8')}
+    r = requests.post(get_token_url, data=payload, headers=headers)
+    results_json = r.json()
+    self.raw_token_results = r.json()
+    return results_json
+
   def cli_auth_dance(self):
     self.get_yahoo_auth_url()
     if sys.version_info < (3, 0):
