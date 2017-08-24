@@ -31,6 +31,7 @@ class BrightRollClient:
   request_auth_url = None
   yahoo_auth = None
   raw_token_results = None
+  refresh_token = None
   token = None
 
 
@@ -40,6 +41,13 @@ class BrightRollClient:
     self.id_host = os.environ['BR_ID_HOST']
     self.dsp_host = os.environ['BR_DSP_HOST']
     self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
+    try:
+        self.refresh_token = os.environ['BR_REFRESH_TOKEN']
+        self.raw_token_results = {}
+        self.raw_token_results['refresh_token'] = os.environ['BR_REFRESH_TOKEN']
+    except KeyError as e:
+        print("error missing:")
+        print(e)
 
   def get_yahoo_auth_url(self):
     print("Go to this URL:")
@@ -58,6 +66,7 @@ class BrightRollClient:
     payload = "grant_type=authorization_code&redirect_uri=oob&code=" + self.yahoo_auth
     # headers = {'Content-Type': 'application/json', 'Authorization': "Basic " + self.base64auth()}
     headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth().decode('utf-8')}
+            
     print(get_token_url)
     print(payload)
     print(headers)
@@ -68,11 +77,16 @@ class BrightRollClient:
 
   def refresh_access_token(self):
     get_token_url = self.id_host + "/oauth2/get_token"
-    payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results['refresh_token'].encode('utf-8')
+    try:
+        payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results['refresh_token'].encode('utf-8')
+    except:
+        payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results['refresh_token']
+        
     headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth().decode('utf-8')}
     r = requests.post(get_token_url, data=payload, headers=headers)
     results_json = r.json()
     self.raw_token_results = r.json()
+    self.refresh_token = self.raw_token_results['refresh_token']
     return results_json
 
   def cli_auth_dance(self):
@@ -86,37 +100,70 @@ class BrightRollClient:
     self.raw_token_results = self.get_access_token_json()
     print("raw_token_results:")
     print(self.raw_token_results)
+    self.refresh_token = self.raw_token_results['refresh_token']
+    print("refresh_token:")
+    print(self.refresh_token)
 
   #
   #
   # traffic types
   #
   #
+
+  # {'errors': {'httpStatusCode': 401, 'message': 'HTTP 401 Unauthorized', 'validationErrors': []}, 'response': None, 'timeStamp': '2017-08-24T20:22:48Z'}
   def traffic_types(self, s_type):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     results = requests.get(self.dsp_host + "/traffic/" + str(s_type)  , headers=headers)
     types = results.json()
+    try:
+        if types['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
     return types
 
   def traffic_type_by_id(self, s_type, cid):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     result = requests.get(self.dsp_host + "/traffic/" + str(s_type)  + "/" + str(cid), headers=headers)
     traffic_type = result.json()
+    try:
+        if traffic_type['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
     return traffic_type
   
   def traffic_types_by_filter(self, s_type, account_id, page, limit, sort, direction, query):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     results = requests.get(self.dsp_host + "/traffic/" + str(s_type) + "?accountId=" + str(account_id) + "&page=" + str(page) + "&limit=" + str(limit) + "&sort=" + str(sort) + "&dir=" + str(direction) + "&query=" + str(query), headers=headers)
     traffic_types = results.json()
+    try:
+        if traffic_types['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
     return traffic_types
     
   def update_traffic_type(self, s_type, cid, payload):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     r = requests.put(self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid), data=payload, headers=headers)
+    results = r.json()
+    try:
+        if results['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
+    
     return r
 
   def create_traffic_type(self, s_type, payload):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     r = requests.post(self.dsp_host + "/traffic/" + str(s_type) , data=payload, headers=headers)
+    results = r.json()
+    try:
+        if results['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
     return r
 
