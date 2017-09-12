@@ -20,3 +20,22 @@ brc.refresh_access_token()
 
 brc.traffic_types('advertisers')
 
+# available methods
+
+brc.traffic_types(traffic_type_object), where traffic_type_object can be:
+* advertisers
+* campaigns
+* deals
+* lines
+* "dictionary"
+* exchanges
+* contextuals
+* sitelists
+* beacons (pixels)
+* audiences (SRT & MRT)
+* usergroups
+* dictionary
+
+brc.traffic_type_by_id(traffic_type_object, object_id)
+
+brc.dictionary(targetingTypes)
