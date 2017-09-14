@@ -122,6 +122,7 @@ class BrightRollClient:
         print("expected result")
     return types
 
+  # TODO: currently only works for advertisers
   def traffic_type_by_id(self, s_type, cid):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     result = requests.get(self.dsp_host + "/traffic/" + str(s_type)  + "/" + str(cid), headers=headers)
@@ -132,10 +133,24 @@ class BrightRollClient:
     except:
         print("expected result")
     return traffic_type
-  
-  def traffic_types_by_filter(self, s_type, account_id, page, limit, sort, direction, query):
+
+  # TODO:
+  # do not pass to the results string if not set on our end
+  def traffic_types_by_filter(self, s_type, account_id, page=0, limit=0, sort='', direction='asc', query=''):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    results = requests.get(self.dsp_host + "/traffic/" + str(s_type) + "?accountId=" + str(account_id) + "&page=" + str(page) + "&limit=" + str(limit) + "&sort=" + str(sort) + "&dir=" + str(direction) + "&query=" + str(query), headers=headers)
+    url = self.dsp_host + "/traffic/" + str(s_type) + "?accountId=" + str(account_id)
+    if page > 0:
+        url = url + "&page=" + str(page)
+    if limit > 0:
+        url = url + "&limit=" + str(limit)
+    if sort != '':
+        url = url + "&sort=" + str(sort)
+    if query != '':
+        url = url + "&query=" + str(query)
+    url = url + "&dir=" + str(direction)
+    
+    results = requests.get(url, headers=headers)
+
     traffic_types = results.json()
     try:
         if traffic_types['errors']['httpStatusCode'] == 401:

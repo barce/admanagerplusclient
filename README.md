@@ -22,7 +22,12 @@ brc.traffic_types('advertisers')
 
 # available methods
 
-brc.traffic_types(traffic_type_object), where traffic_type_object can be:
+# brc.traffic_types(traffic_type_object)
+
+brc.traffic_types('advertisers')
+brc.traffic_types('advertisers?page={page}&limit={limit}&sort={sort}&dir={dir}&query={query}')
+
+Traffic_type_object can be:
 * advertisers
 * campaigns
 * deals
