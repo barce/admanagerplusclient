@@ -41,6 +41,7 @@ class BrightRollClient:
     self.id_host = os.environ['BR_ID_HOST']
     self.dsp_host = os.environ['BR_DSP_HOST']
     self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
+    self.current_url = ''
     try:
         self.refresh_token = os.environ['BR_REFRESH_TOKEN']
         self.raw_token_results = {}
@@ -113,7 +114,8 @@ class BrightRollClient:
   # {'errors': {'httpStatusCode': 401, 'message': 'HTTP 401 Unauthorized', 'validationErrors': []}, 'response': None, 'timeStamp': '2017-08-24T20:22:48Z'}
   def traffic_types(self, s_type):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    results = requests.get(self.dsp_host + "/traffic/" + str(s_type)  , headers=headers)
+    url = self.dsp_host + "/traffic/" + str(s_type)
+    results = requests.get(url, headers=headers)
     types = results.json()
     try:
         if types['errors']['httpStatusCode'] == 401:
@@ -125,7 +127,17 @@ class BrightRollClient:
   # TODO: currently only works for advertisers
   def traffic_type_by_id(self, s_type, cid):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    result = requests.get(self.dsp_host + "/traffic/" + str(s_type)  + "/" + str(cid), headers=headers)
+    url = self.dsp_host + "/traffic/" + str(s_type)
+    if s_type == 'advertisers':
+        url = url + "/" + str(cid)
+    elif s_type == 'campaigns':
+        url = url + "/" + str(cid)
+    elif s_type == 'lines':
+        url = url + "?orderId=" + str(cid)
+    else:
+        url = url + "/" + str(cid)
+    
+    result = requests.get(url, headers=headers)
     traffic_type = result.json()
     try:
         if traffic_type['errors']['httpStatusCode'] == 401:
@@ -138,7 +150,12 @@ class BrightRollClient:
   # do not pass to the results string if not set on our end
   def traffic_types_by_filter(self, s_type, account_id, page=0, limit=0, sort='', direction='asc', query=''):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    url = self.dsp_host + "/traffic/" + str(s_type) + "?accountId=" + str(account_id)
+    url = self.dsp_host + "/traffic/" + str(s_type)
+    if s_type == 'lines':
+        url = url + "?orderId=" + str(account_id)
+    else:
+        url = url + "?accountId=" + str(account_id)
+        
     if page > 0:
         url = url + "&page=" + str(page)
     if limit > 0:
@@ -148,7 +165,7 @@ class BrightRollClient:
     if query != '':
         url = url + "&query=" + str(query)
     url = url + "&dir=" + str(direction)
-    
+
     results = requests.get(url, headers=headers)
 
     traffic_types = results.json()
