@@ -22,6 +22,60 @@ try:
 except ImportError:
     use_environment_variables = True
 
+class SiteList:
+    id = None
+    name = None
+    accountId = 0
+    status = None
+    list_type = None
+    isShared = None
+    childrenCount = None
+    updatedAt = None
+    items = []
+    br_client = None
+    
+    def __init__(self, br_client):
+        self.br_client = br_client
+
+    def read_by_id(self, cid):
+        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.br_client.raw_token_results['access_token'])}
+        url = self.br_client.dsp_host + "/traffic/sitelists"
+        url = url + "/" + str(cid)
+    
+        result = requests.get(url, headers=headers)
+        traffic_type = result.json()
+        try:
+            if traffic_type['errors']['httpStatusCode'] == 401:
+                refresh_results_json = self.br_client.refresh_access_token()
+        except:
+            print("expected result")
+        return traffic_type
+
+    def update(self, cid, lists):
+        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+        r = requests.put(self.dsp_host + "/traffic/sitelists/" + str(cid), data=lists, headers=headers)
+        results = r.json()
+        try:
+            if results['errors']['httpStatusCode'] == 401:
+                refresh_results_json = self.refresh_access_token()
+        except:
+            print("expected result")
+    
+        return r
+
+    def create(self, s_type, lists):
+        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+        r = requests.post(self.dsp_host + "/traffic/sitelists" , data=lists, headers=headers)
+        results = r.json()
+        try:
+            if results['errors']['httpStatusCode'] == 401:
+                refresh_results_json = self.refresh_access_token()
+        except:
+            print("expected result")
+        return r
+
+        
+    
 
 class BrightRollClient:
   client_id = None
@@ -33,7 +87,10 @@ class BrightRollClient:
   raw_token_results = None
   refresh_token = None
   token = None
-
+  current_url = ''
+  report_url = ''
+  customerReportId = ''
+  report_results_url = ''
 
   def __init__(self):
     self.client_id = os.environ['BR_CLIENT_ID']
@@ -42,6 +99,7 @@ class BrightRollClient:
     self.dsp_host = os.environ['BR_DSP_HOST']
     self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
     self.current_url = ''
+    self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
     try:
         self.refresh_token = os.environ['BR_REFRESH_TOKEN']
         self.raw_token_results = {}
@@ -199,3 +257,33 @@ class BrightRollClient:
         print("expected result")
     return r
 
+  def create_report(self, reportOption, intervalTypeId, dateTypeId, startDate, endDate):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    payload = {"reportOption": reportOption, "intervalTypeId": intervalTypeId, "dateTypeId": dateTypeId, "startDate": startDate, "endDate": endDate}
+    print(payload)
+    r = requests.post(self.report_url, data=payload, headers=headers)
+    print(self.report_url)
+    print(r)
+    print(r.body)
+    results = r.json()
+    try:
+        if results['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
+    self.customerReportId = results['customerReportId']
+    return r
+    
+  def extract_report(self):
+    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    results = requests.get(self.report_url + self.customerReportId, headers=headers)
+
+    r = results.json()
+    try:
+        if r['errors']['httpStatusCode'] == 401:
+            refresh_results_json = self.refresh_access_token()
+    except:
+        print("expected result")
+    self.report_results_url = r['url']
+    return r['url']
+    
