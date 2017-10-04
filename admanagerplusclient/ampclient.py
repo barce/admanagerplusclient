@@ -314,7 +314,14 @@ class BrightRollClient:
   def create_report(self, reportOption, intervalTypeId, dateTypeId, startDate, endDate):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     payload = {"reportOption": reportOption, "intervalTypeId": intervalTypeId, "dateTypeId": dateTypeId, "startDate": startDate, "endDate": endDate}
+    print('--- payload ---')
     print(payload)
+    print('--- payload ---')
+
+    print('--- headers ---')
+    print(headers)
+    print('--- headers ---')
+
     r = requests.post(self.report_url, data=payload, headers=headers)
     print(self.report_url)
     print(r)
