@@ -322,10 +322,10 @@ class BrightRollClient:
     print(headers)
     print('--- headers ---')
 
-    r = requests.post(self.report_url, data=payload, headers=headers)
+    r = requests.post(self.report_url, data=str(payload).replace("'",'"'), headers=headers)
     print(self.report_url)
     print(r)
-    print(r.body)
+    print(r.json())
     results = r.json()
     try:
         if results['errors']['httpStatusCode'] == 401:
