@@ -345,6 +345,12 @@ class BrightRollClient:
             refresh_results_json = self.refresh_access_token()
     except:
         print("expected result")
-    self.report_results_url = r['url']
-    return r['url']
+    print('--- extracted report json ---')
+    print(r)
+    print('--- extracted report json ---')
+    try:
+        self.report_results_url = r['url']
+    except:
+        self.report_results_url = ''
+    return self.report_results_url
     
