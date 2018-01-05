@@ -352,5 +352,14 @@ class BrightRollClient:
         self.report_results_url = r['url']
     except:
         self.report_results_url = ''
+
+    try:
+        validationMessages = r['validationMessages']
+        if validationMessages[0]['message'] == 'Requests Per Minute (RPM) limit reached. Please try again later.':
+            print('sleeping for a minute...')
+            time.sleep(60)
+    except:
+        print('no sleep')
+        
     return self.report_results_url
     
