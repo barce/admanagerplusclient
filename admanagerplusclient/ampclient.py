@@ -165,7 +165,10 @@ class BrightRollClient:
         print(e)
 
   def curl_debug(self):
-    
+      print(self.headers)
+      print(self.curl_url)
+      return self.curl_url
+
   def get_yahoo_auth_url(self):
     print("Go to this URL:")
     print(self.request_auth_url)
