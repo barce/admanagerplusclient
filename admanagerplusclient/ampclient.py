@@ -145,6 +145,8 @@ class BrightRollClient:
   report_url = ''
   customerReportId = ''
   report_results_url = ''
+  headers = None
+  curl_url = None
 
   def __init__(self):
     self.client_id = os.environ['BR_CLIENT_ID']
@@ -162,6 +164,8 @@ class BrightRollClient:
         print("error missing:")
         print(e)
 
+  def curl_debug(self):
+    
   def get_yahoo_auth_url(self):
     print("Go to this URL:")
     print(self.request_auth_url)
@@ -336,8 +340,9 @@ class BrightRollClient:
     return r
     
   def extract_report(self):
-    headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
-    results = requests.get(self.report_url + self.customerReportId, headers=headers)
+    self.headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    results = requests.get(self.report_url + self.customerReportId, headers=self.headers)
+    self.curl_url = self.report_url + self.customerReportId
 
     r = results.json()
     try:

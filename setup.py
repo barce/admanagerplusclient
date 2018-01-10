@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='admanagerplusclient',
-    version='0.4.0',
+    version='0.5.0',
     author='Jim Barcelona',
     author_email='barce@me.com',
     packages=['admanagerplusclient', 'admanagerplusclient.tests'],
