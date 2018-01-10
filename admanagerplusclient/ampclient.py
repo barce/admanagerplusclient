@@ -164,7 +164,7 @@ class BrightRollClient:
         print("error missing:")
         print(e)
 
-  def curl_debug(self):
+  def debug_curl(self):
       print(self.headers)
       print(self.curl_url)
       return self.curl_url
@@ -346,6 +346,7 @@ class BrightRollClient:
     self.headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     results = requests.get(self.report_url + self.customerReportId, headers=self.headers)
     self.curl_url = self.report_url + self.customerReportId
+    self.debug_curl()
 
     r = results.json()
     try:
