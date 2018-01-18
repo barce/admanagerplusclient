@@ -258,18 +258,12 @@ class BrightRollClient:
         print("expected result")
     return types
 
-  # TODO: currently only works for advertisers
+  # Works for s_types:
+  # advertisers, campaigns, lines
   def traffic_type_by_id(self, s_type, cid):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     url = self.dsp_host + "/traffic/" + str(s_type)
-    if s_type == 'advertisers':
-        url = url + "/" + str(cid)
-    elif s_type == 'campaigns':
-        url = url + "/" + str(cid)
-    elif s_type == 'lines':
-        url = url + "?orderId=" + str(cid)
-    else:
-        url = url + "/" + str(cid)
+    url = url + "/" + str(cid)
     
     result = requests.get(url, headers=headers)
     traffic_type = result.json()
