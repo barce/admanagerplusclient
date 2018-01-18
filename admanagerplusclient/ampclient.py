@@ -365,8 +365,9 @@ class BrightRollClient:
     try:
         validationMessages = r['validationMessages']
         if validationMessages[0]['message'] == 'Requests Per Minute (RPM) limit reached. Please try again later.':
-            print('sleeping for a minute...')
-            time.sleep(60)
+            print('return rate limit message')
+            return validationMessages[0]['message']
+            
     except:
         print('no sleep')
         
