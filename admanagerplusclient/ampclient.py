@@ -148,11 +148,26 @@ class BrightRollClient:
   headers = None
   curl_url = None
 
-  def __init__(self):
-    self.client_id = os.environ['BR_CLIENT_ID']
-    self.client_secret = os.environ['BR_CLIENT_SECRET']
-    self.id_host = os.environ['BR_ID_HOST']
-    self.dsp_host = os.environ['BR_DSP_HOST']
+  def __init__(self, client_id='', client_secret='', id_host='', dsp_host=''):
+    if len(client_id) == 0:
+        try:
+            self.client_id = os.environ['BR_CLIENT_ID']
+            self.client_secret = os.environ['BR_CLIENT_SECRET']
+            self.id_host = os.environ['BR_ID_HOST']
+            self.dsp_host = os.environ['BR_DSP_HOST']
+        except KeyError, e:
+            print("Key error: {}".format(e.message))
+            print("Missing environment variables. Be sure to assign values to:")
+            print("apiclient.client_id")
+            print("apiclient.client_secret")
+            print("apiclient.id_host")
+            print("apiclient.dsp_host")
+    else:
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.id_host = id_host
+        self.dsp_host = dsp_host
+         
     self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
     self.current_url = ''
     self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
