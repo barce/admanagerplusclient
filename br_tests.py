@@ -24,6 +24,8 @@ print('PAUSED')
 print('running update with complete object...')
 resp = brc.update_traffic_type('campaigns', 86184, json.dumps(campaign['response']))
 
+exit()
+
 print('fetching updated campaign...')
 campaign = brc.traffic_type_by_id('campaigns', 86184)
 print(campaign)

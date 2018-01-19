@@ -147,6 +147,7 @@ class BrightRollClient:
   report_results_url = ''
   headers = None
   curl_url = None
+  payload = ''
 
   def __init__(self, client_id='', client_secret='', id_host='', dsp_host=''):
     if len(client_id) == 0:
@@ -179,10 +180,27 @@ class BrightRollClient:
         print("error missing:")
         print(e)
 
-  def debug_curl(self):
+  def debug_curl(self, http_type='GET'):
+      print('--- debug_curl ---')
       print(self.headers)
       print(self.curl_url)
-      return self.curl_url
+      print(self.payload)
+      print('--- debug_curl ---')
+      
+      # convert to cURL
+      # exampli gratia: 
+      # curl -X PUT https://api.one.aol.com/advertiser/inventory-management/v1/organizations/7000095690/advertisers/7000095690/whitelists  -H 'x-api-key: XlcRtA3hxcTDxwBvT3Nv9ra0BwPHxLe4N9xYYNn7' -H 'Content-Type: application/json' -H 'Authorization: Bearer a9d2241f-e2bb-4ec5-a758-67ca30924211' -d "{\"path\": \"/name\", \"value\": \"updated whitelist - 2017-12-06 15:10:11.225349\", \"op\": \"REPLACE\"}"
+      curl_command = "curl -X " + http_type + " " + self.curl_url + " "
+      # loop through headers to create headers string
+      s_headers = ''
+      for key,val in self.headers.items():
+        s_headers = s_headers + "-H '{}: {}' ".format(key, val)
+      curl_command = curl_command + s_headers
+      if http_type != 'GET':
+          curl_command = curl_command + '-d ' + self.payload
+
+      print(curl_command)
+      return curl_command
 
   def get_yahoo_auth_url(self):
     print("Go to this URL:")
@@ -262,8 +280,11 @@ class BrightRollClient:
   # advertisers, campaigns, lines
   def traffic_type_by_id(self, s_type, cid):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
+    self.headers = headers
     url = self.dsp_host + "/traffic/" + str(s_type)
     url = url + "/" + str(cid)
+    self.curl_url = url
+    self.debug_curl()
     
     result = requests.get(url, headers=headers)
     traffic_type = result.json()
@@ -308,6 +329,11 @@ class BrightRollClient:
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
     r = requests.put(self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid), data=payload, headers=headers)
     results = r.json()
+    self.headers = headers
+    self.payload = payload
+    self.curl_url = self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid)
+    self.debug_curl('PUT')
+    print(results)
     try:
         if results['errors']['httpStatusCode'] == 401:
             refresh_results_json = self.refresh_access_token()
