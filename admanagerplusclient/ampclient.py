@@ -180,6 +180,12 @@ class BrightRollClient:
         print("error missing:")
         print(e)
 
+  def set_refresh_token(self, refresh_token):
+      self.refresh_token = refresh_token
+      self.raw_token_results = {}
+      self.raw_token_results['refresh_token'] = refresh_token
+      return self.refresh_token
+
   def debug_curl(self, http_type='GET'):
       print('--- debug_curl ---')
       print(self.headers)
