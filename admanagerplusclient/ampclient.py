@@ -346,7 +346,7 @@ class BrightRollClient:
     except:
         print("expected result")
     
-    return r
+    return results
 
   def create_traffic_type(self, s_type, payload):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
@@ -357,7 +357,7 @@ class BrightRollClient:
             refresh_results_json = self.refresh_access_token()
     except:
         print("expected result")
-    return r
+    return results
 
   def create_report(self, reportOption, intervalTypeId, dateTypeId, startDate, endDate):
     headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.raw_token_results['access_token'])}
