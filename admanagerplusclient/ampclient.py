@@ -273,19 +273,21 @@ class BrightRollClient:
 
   def generate_json_response(self, r, results_json, request_body):
     response_json = {
-      'response_code': r.status_code,
       'request_body': request_body
     }
-    # if request is successful, ensure msg_type is success
-    if r.status_code in [200, 201]:
-      response_json['msg_type'] = 'success'
-      response_json['msg'] = ''
-      response_json['data'] = results_json
-    else:
+
+    if results_json['errors'] is not None:
       response_json['msg_type'] = 'error'
-      # display the error message that comes back from request
       response_json['msg'] = results_json['errors']
       response_json['data'] = results_json['errors']
+      response_json['response_code'] = results_json['errors']['httpStatusCode']
+
+    else:
+      response_json['msg_type'] = 'success'
+      # display the error message that comes back from request
+      response_json['msg'] = ''
+      response_json['data'] = results_json
+      response_json['response_code'] = r.status_code
 
     return response_json
 
@@ -318,7 +320,6 @@ class BrightRollClient:
     return r, results_json
 
   def error_check_json(self):
-    # if results_json['error']['httpStatusCode'] in ['401'] or results_json['code'] in ['401']:
     refresh_results_json = self.refresh_access_token()
     return refresh_results_json
 
