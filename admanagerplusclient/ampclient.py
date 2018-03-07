@@ -180,6 +180,8 @@ class BrightRollClient:
         print("error missing:")
         print(e)
 
+    self.inventory_payload = None
+
   def set_refresh_token(self, refresh_token):
       self.refresh_token = refresh_token
       self.raw_token_results = {}
@@ -437,7 +439,7 @@ class BrightRollClient:
         
     return self.report_results_url
 
-    def create_sitelist(self, advertiser_id, name, list_type, list):
+  def create_sitelist(self, advertiser_id, name, list_type, list):
       app_domain_data = []
       for item in list:
         app_domain_data.append({"itemName": str(item)})
@@ -455,7 +457,7 @@ class BrightRollClient:
       r = self.make_request(url, headers, 'POST', payload)
       return r
     
-    def update_sitelist(self, id, advertiser_id, name, list_type, list):
+  def update_sitelist(self, id, advertiser_id, name, list_type, list):
       app_domain_data = []
       for item in list:
         app_domain_data.append({"itemName": str(item)})
@@ -473,7 +475,15 @@ class BrightRollClient:
       r = self.make_request(url, headers, 'PUT', payload)
       return r
 
-    def set_sitelists(self, dsp_lineitem_id, add_site_list_ids, remove_site_list_ids=[]):
+  def set_inventory_payload(self, dsp_lineitem_id):
+      self.dsp_lineitem_id = dsp_lineitem_id
+
+      self.inventory_payload = {
+        "id": self.dsp_lineitem_id,
+        "types": []
+      }
+
+  def set_sitelists(self, add_site_list_ids, remove_site_list_ids=[]):
       site_list_data = []
       for id in add_site_list_ids:
         rval = {
@@ -482,21 +492,52 @@ class BrightRollClient:
         }
         site_list_data.append(rval)
 
-      payload = {
-        "id": dsp_lineitem_id,
-        "siteLists": "",
-        "types": []
-      }
-      payload["siteLists"] = {
+      self.inventory_payload["siteLists"] = {
         "removed": remove_site_list_ids,
         "clearAll": "false",
         "added": site_list_data
       }
-      payload["types"].append({"name": "SITE_LISTS","isTargeted": "true"})
+      self.inventory_payload["types"].append(
+        {
+          "name": "SITE_LISTS",
+          "isTargeted": "true"
+        }
+      )
 
+  def set_deals(self, deal_ids):
+      add_deal_ids = []
+      for id in deal_ids:
+        add_deal_ids.append(int(id))
+
+      self.inventory_payload["deals"] = {
+        #"removed": [],
+        "clearAll": "false",
+        "added": add_deal_ids
+      }
+      self.inventory_payload["types"].append(
+        {
+          "name": "EXCHANGES",
+          "isTargeted": "true"
+        }
+      )
+
+  def set_exchanges(self, exchange_ids):
+      add_exchange_ids = []
+      for id in exchange_ids:
+        add_exchange_ids.append(int(id))
+
+      self.inventory_payload["publishers"] = add_exchange_ids
+      self.inventory_payload["types"].append(
+        {
+          "name": "EXCHANGES",
+          "isTargeted": "true"
+        }
+      )
+
+  def update_inventory(self):
       headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-      url = self.dsp_host + "/traffic/lines/{0}/targeting".format(int(dsp_lineitem_id))
-      r = self.make_request(url, headers, 'POST', payload)
+      url = self.dsp_host + "/traffic/lines/{0}/targeting".format(int(self.dsp_lineitem_id))
+      r = self.make_request(url, headers, 'POST', self.inventory_payload)
       return r
 
   def _convert_to_curl(self, method, url, headers, data):
