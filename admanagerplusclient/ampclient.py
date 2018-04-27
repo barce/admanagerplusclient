@@ -247,7 +247,10 @@ class BrightRollClient:
     headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': "Basic " + self.base64auth().decode('utf-8')}
     r = requests.post(get_token_url, data=payload, headers=headers)
     results_json = r.json()
-    self.token = results_json['access_token']
+    try:
+        self.token = results_json['access_token']
+    except:
+        pass
     # self.raw_token_results = r.json()
     # self.refresh_token = self.raw_token_results['refresh_token']
     return results_json
