@@ -156,7 +156,7 @@ class BrightRollClient:
             self.client_secret = os.environ['BR_CLIENT_SECRET']
             self.id_host = os.environ['BR_ID_HOST']
             self.dsp_host = os.environ['BR_DSP_HOST']
-        except KeyError, e:
+        except KeyError as e:
             print("Key error: {}".format(e.message))
             print("Missing environment variables. Be sure to assign values to:")
             print("apiclient.client_id")
