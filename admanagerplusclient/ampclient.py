@@ -478,11 +478,8 @@ class BrightRollClient:
       r = self.make_request(url, headers, 'PUT', payload)
       return r
 
-  def set_inventory_payload(self, dsp_lineitem_id):
-      self.dsp_lineitem_id = dsp_lineitem_id
-
+  def set_inventory_payload(self):
       self.inventory_payload = {
-        "id": self.dsp_lineitem_id,
         "types": []
       }
 
