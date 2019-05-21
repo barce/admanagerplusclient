@@ -342,7 +342,7 @@ class BrightRollClient:
 
         print ("results_json")
         print (results_json)
-        
+
         return r, results_json
 
     def error_check_json(self):
@@ -513,20 +513,20 @@ class BrightRollClient:
         site_list_data = []
         for id in add_site_list_ids:
             rval = {
-                "excluded": "false",
+                "excluded": False,
                 "entityId": int(id)
             }
             site_list_data.append(rval)
 
         self.inventory_payload["siteLists"] = {
             "removed": remove_site_list_ids,
-            "clearAll": "false",
+            "clearAll": False,
             "added": site_list_data
         }
         self.inventory_payload["types"].append(
             {
                 "name": "SITE_LISTS",
-                "isTargeted": "true"
+                "isTargeted": True
             }
         )
 
@@ -537,13 +537,13 @@ class BrightRollClient:
 
         self.inventory_payload["deals"] = {
             # "removed": [],
-            "clearAll": "false",
+            "clearAll": False,
             "added": add_deal_ids
         }
         self.inventory_payload["types"].append(
             {
                 "name": "EXCHANGES",
-                "isTargeted": "true"
+                "isTargeted": True
             }
         )
 
@@ -556,7 +556,7 @@ class BrightRollClient:
         self.inventory_payload["types"].append(
             {
                 "name": "EXCHANGES",
-                "isTargeted": "true"
+                "isTargeted": True
             }
         )
 
