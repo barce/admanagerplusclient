@@ -553,6 +553,7 @@ class BrightRollClient:
             add_exchange_ids.append(int(id))
 
         self.inventory_payload["publishers"] = add_exchange_ids
+        self.inventory_payload["publishersIncluded"] = True
         self.inventory_payload["types"].append(
             {
                 "name": "EXCHANGES",
