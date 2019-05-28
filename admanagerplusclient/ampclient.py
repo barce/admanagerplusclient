@@ -157,33 +157,20 @@ class BrightRollClient:
     curl_url = None
     payload = ''
 
-    def __init__(self, client_id='', client_secret='', id_host='', dsp_host=''):
-        if len(client_id) == 0:
-            try:
-                self.client_id = os.environ['BR_CLIENT_ID']
-                self.client_secret = os.environ['BR_CLIENT_SECRET']
-                self.id_host = os.environ['BR_ID_HOST']
-                self.dsp_host = os.environ['BR_DSP_HOST']
-            except KeyError as e:
-                print("Key error: {}".format(e.message))
-                print("Missing environment variables. Be sure to assign values to:")
-                print("apiclient.client_id")
-                print("apiclient.client_secret")
-                print("apiclient.id_host")
-                print("apiclient.dsp_host")
-        else:
-            self.client_id = client_id
-            self.client_secret = client_secret
-            self.id_host = id_host
-            self.dsp_host = dsp_host
+    def __init__(self, client_id, client_secret, id_host, dsp_host, refresh_token):
+
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.id_host = id_host
+        self.dsp_host = dsp_host
+        self.refresh_token = refresh_token
 
         self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
         self.current_url = ''
         self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
         try:
-            self.refresh_token = os.environ['BR_REFRESH_TOKEN']
             self.raw_token_results = {}
-            self.raw_token_results['refresh_token'] = os.environ['BR_REFRESH_TOKEN']
+            self.raw_token_results['refresh_token'] = self.refresh_token
         except KeyError as e:
             print("error missing:")
             print(e)
