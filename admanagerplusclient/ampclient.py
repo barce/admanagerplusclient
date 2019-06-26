@@ -385,15 +385,15 @@ class BrightRollClient:
         r = json.dumps(r)
         return r
 
-    def update_traffic_type(self, s_type, cid, payload):
+    def update_traffic_type(self, s_type, cid, payload, seat_id):
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid)
+        url = self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid) + "/?seatId=" + str(seat_id)
         r = self.make_request(url, headers, 'PUT', payload)
         return r
 
-    def create_traffic_type(self, s_type, payload):
+    def create_traffic_type(self, s_type, payload, seat_id):
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/" + str(s_type)
+        url = self.dsp_host + "/traffic/" + str(s_type) + "/?seatId=" + str(seat_id)
         r = self.make_request(url, headers, 'POST', payload)
         return r
 
@@ -455,7 +455,7 @@ class BrightRollClient:
 
         return self.report_results_url
 
-    def create_sitelist(self, advertiser_id, name, list_type, list):
+    def create_sitelist(self, advertiser_id, seat_id, name, list_type, list):
         app_domain_data = []
         for item in list:
             app_domain_data.append({"itemName": str(item)})
@@ -469,11 +469,11 @@ class BrightRollClient:
         }
 
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/sitelists"
+        url = self.dsp_host + "/traffic/sitelists/?seatId={0}".format(seat_id)
         r = self.make_request(url, headers, 'POST', payload)
         return r
 
-    def update_sitelist(self, id, advertiser_id, name, list_type, list):
+    def update_sitelist(self, id, advertiser_id, seat_id, name, list_type, list):
         app_domain_data = []
         for item in list:
             app_domain_data.append({"itemName": str(item)})
@@ -487,7 +487,7 @@ class BrightRollClient:
         }
 
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/sitelists/" + str(id)
+        url = self.dsp_host + "/traffic/sitelists/" + str(id) + "?seatId={0}".format(seat_id)
         r = self.make_request(url, headers, 'PUT', payload)
         return r
 
@@ -550,9 +550,9 @@ class BrightRollClient:
             }
         )
 
-    def update_inventory(self):
+    def update_inventory(self, seat_id):
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/lines/{0}/targeting".format(int(self.dsp_lineitem_id))
+        url = self.dsp_host + "/traffic/lines/{0}/targeting?seatId={1}".format(int(self.dsp_lineitem_id), seat_id)
         r = self.make_request(url, headers, 'POST', self.inventory_payload)
         return r
 
