@@ -337,9 +337,11 @@ class BrightRollClient:
         return refresh_results_json
 
     # {'errors': {'httpStatusCode': 401, 'message': 'HTTP 401 Unauthorized', 'validationErrors': []}, 'response': None, 'timeStamp': '2017-08-24T20:22:48Z'}
-    def traffic_types(self, s_type, seat_id):
+    def traffic_types(self, s_type, seat_id=None):
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        url = self.dsp_host + "/traffic/" + str(s_type) + "/?seatId=" + str(seat_id)
+        url = self.dsp_host + "/traffic/" + str(s_type)
+        if seat_id is not None:
+            url += "/?seatId=" + str(seat_id)
 
         r = self.make_request(url, headers, 'GET')
         return r
