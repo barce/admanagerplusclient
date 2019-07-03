@@ -312,10 +312,10 @@ class BrightRollClient:
         return json.dumps(response_json)
 
     def make_new_request(self, url, token, method_type, headers, data=None):
-        print ("URL")
-        print (url)
-        print ("DATA")
-        print (data)
+        #print ("URL")
+        #print (url)
+        #print ("DATA")
+        #print (data)
 
         # modify headers with new access token
         headers['X-Auth-Token'] = token
@@ -327,8 +327,8 @@ class BrightRollClient:
             r = requests.put(url, headers=headers, verify=False, data=json.dumps(data))
         results_json = r.json()
 
-        print ("results_json")
-        print (results_json)
+        #print ("results_json")
+        #print (results_json)
 
         return r, results_json
 
