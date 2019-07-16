@@ -329,6 +329,15 @@ class BrightRollClient:
 
         #print ("results_json")
         #print (results_json)
+        command = "curl -v -H {headers} {data} -X {method} {uri}"
+        header_list = ['"{0}: {1}"'.format(k, v) for k, v in headers.items()]
+        header = " -H ".join(header_list)
+        print ("===========================")
+        print ("")
+        print (command.format(method=method_type, headers=header, data=data, uri=url))
+        print ("")
+        print ("")
+        print ("================================")
 
         return r, results_json
 
