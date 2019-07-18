@@ -155,6 +155,7 @@ class BrightRollClient:
     report_results_url = ''
     headers = None
     curl_url = None
+    curl_command = None
     payload = ''
 
     def __init__(self, client_id, client_secret, id_host, dsp_host, refresh_token):
@@ -277,7 +278,7 @@ class BrightRollClient:
 
     def generate_json_response(self, r, results_json, request_body):
         response_json = {
-            'request_body': request_body
+            'request_body': self.curl_command
         }
 
         if results_json['errors'] is not None:
@@ -332,12 +333,15 @@ class BrightRollClient:
         command = "curl -v -H {headers} {data} -X {method} {uri}"
         header_list = ['"{0}: {1}"'.format(k, v) for k, v in headers.items()]
         header = " -H ".join(header_list)
+        self.curl_command = command.format(method=method_type, headers=header, data=data, uri=url)
+        """
         print ("===========================")
         print ("")
         print (command.format(method=method_type, headers=header, data=data, uri=url))
         print ("")
         print ("")
         print ("================================")
+        """
 
         return r, results_json
 
