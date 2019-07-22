@@ -4,18 +4,13 @@ import json
 import requests
 import base64
 
-import sys
-
-# if sys.version_info < (3, 0):
-#     raise "must use python 2.5 or greater"
-
 use_environment_variables = None
 
 try:
     from django.conf import settings
 except ImportError:
     use_environment_variables = True
-    
+
 
 class Contextual:
     id = None
