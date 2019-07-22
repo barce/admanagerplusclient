@@ -17,7 +17,7 @@ except ImportError:
     use_environment_variables = True
 
 
-class BrightRollClient:
+class Base:
     client_id = None
     client_secret = None
     id_host = None
