@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import json
-import jwt
 import requests
-import time
-import os
 import base64
 
 import sys
@@ -22,121 +15,6 @@ try:
     from django.conf import settings
 except ImportError:
     use_environment_variables = True
-
-
-class SiteList:
-    id = None
-    name = None
-    accountId = 0
-    status = None
-    list_type = None
-    isShared = None
-    childrenCount = None
-    updatedAt = None
-    items = []
-    br_client = None
-
-    def __init__(self, br_client):
-        self.br_client = br_client
-
-    def read_by_id(self, cid):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.br_client.raw_token_results['access_token'])}
-        url = self.br_client.dsp_host + "/traffic/sitelists"
-        url = url + "/" + str(cid)
-
-        result = requests.get(url, headers=headers)
-        traffic_type = result.json()
-        try:
-            if traffic_type['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.br_client.refresh_access_token()
-        except:
-            print("expected result")
-        return traffic_type
-
-    def update(self, cid, lists):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.raw_token_results['access_token'])}
-        r = requests.put(self.dsp_host + "/traffic/sitelists/" + str(cid), data=lists, headers=headers)
-        results = r.json()
-        try:
-            if results['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.refresh_access_token()
-        except:
-            print("expected result")
-
-        return r
-
-    def create(self, s_type, lists):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.raw_token_results['access_token'])}
-        r = requests.post(self.dsp_host + "/traffic/sitelists", data=lists, headers=headers)
-        results = r.json()
-        try:
-            if results['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.refresh_access_token()
-        except:
-            print("expected result")
-        return r
-
-
-class Contextual:
-    id = None
-    name = None
-    accountId = 0
-    br_client = None
-    taxonomyType = None
-    categories = {
-        "categories": [
-            {
-                "categoryId": 0
-            },
-        ]
-    }
-    updatedAt = None
-
-    def __init__(self, br_client):
-        self.br_client = br_client
-
-    def read_by_id(self, cid):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.br_client.raw_token_results['access_token'])}
-        url = self.br_client.dsp_host + "/traffic/contextuals"
-        url = url + "/" + str(cid)
-
-        result = requests.get(url, headers=headers)
-        traffic_type = result.json()
-        try:
-            if traffic_type['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.br_client.refresh_access_token()
-        except:
-            print("expected result")
-        return traffic_type
-
-    def update(self, cid, lists):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.raw_token_results['access_token'])}
-        r = requests.put(self.dsp_host + "/traffic/contextuals/" + str(cid), data=lists, headers=headers)
-        results = r.json()
-        try:
-            if results['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.refresh_access_token()
-        except:
-            print("expected result")
-
-        return r
-
-    def create(self, s_type, lists):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH',
-                   'X-Auth-Token': str(self.raw_token_results['access_token'])}
-        r = requests.post(self.dsp_host + "/traffic/contextuals", data=lists, headers=headers)
-        results = r.json()
-        try:
-            if results['errors']['httpStatusCode'] == 401:
-                refresh_results_json = self.refresh_access_token()
-        except:
-            print("expected result")
-        return r
 
 
 class BrightRollClient:
@@ -158,17 +36,18 @@ class BrightRollClient:
     curl_command = None
     payload = ''
 
-    def __init__(self, client_id, client_secret, id_host, dsp_host, refresh_token):
+    def __init__(self, client_id, client_secret, refresh_token):
 
         self.client_id = client_id
         self.client_secret = client_secret
-        self.id_host = id_host
-        self.dsp_host = dsp_host
         self.refresh_token = refresh_token
+        self.id_host = "https://api.login.yahoo.com"
+        self.dsp_host = "https://dspapi.admanagerplus.yahoo.com"
 
         self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
         self.current_url = ''
         self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
+
         try:
             self.raw_token_results = {}
             self.raw_token_results['refresh_token'] = self.refresh_token
@@ -255,7 +134,7 @@ class BrightRollClient:
         # self.refresh_token = self.raw_token_results['refresh_token']
         return results_json
 
-    def cli_auth_dance(self):
+    def cli_auth_dance(self): 
         self.get_yahoo_auth_url()
         if sys.version_info < (3, 0):
             self.yahoo_auth = raw_input("Enter Yahoo! auth code: ")
@@ -304,7 +183,7 @@ class BrightRollClient:
         if results_json['errors'] is not None:
             if results_json['errors']['httpStatusCode'] in [400, 401]:
                 # refresh access token
-                self.token = self.error_check_json()['access_token']
+                self.token = self.refresh_access_token()['access_token']
                 # apply headers with new token, return response and response dict
                 r, results_json = self.make_new_request(url, self.token, method_type, headers, data)
         # use results_json to create updated json dict
@@ -344,10 +223,6 @@ class BrightRollClient:
         """
 
         return r, results_json
-
-    def error_check_json(self):
-        refresh_results_json = self.refresh_access_token()
-        return refresh_results_json
 
     # {'errors': {'httpStatusCode': 401, 'message': 'HTTP 401 Unauthorized', 'validationErrors': []}, 'response': None, 'timeStamp': '2017-08-24T20:22:48Z'}
     def traffic_types(self, s_type, seat_id=None):
