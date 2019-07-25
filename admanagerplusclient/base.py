@@ -85,7 +85,7 @@ class Base:
         print(get_token_url)
         print(payload)
         print(headers)
-        # r = requests.post(get_token_url, json=payload, headers=headers)
+
         r = requests.post(get_token_url, data=payload, headers=headers)
         results_json = r.json()
         return results_json
@@ -100,8 +100,10 @@ class Base:
             payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results[
                 'refresh_token']
 
-        headers = {'Content-Type': 'application/x-www-form-urlencoded',
-                   'Authorization': "Basic " + self.base64auth().decode('utf-8')}
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': "Basic " + self.base64auth().decode('utf-8')
+        }
         r = requests.post(get_token_url, data=payload, headers=headers)
         results_json = r.json()
         try:
@@ -158,12 +160,14 @@ class Base:
     def make_request(self, url, headers, method_type, data=None):
         request_body = url, headers, data
         r, results_json = self.make_new_request(url, self.token, method_type, headers, data)
+
         if results_json['errors'] is not None:
             if results_json['errors']['httpStatusCode'] in [400, 401]:
                 # refresh access token
                 self.token = self.refresh_access_token()['access_token']
                 # apply headers with new token, return response and response dict
                 r, results_json = self.make_new_request(url, self.token, method_type, headers, data)
+
         # use results_json to create updated json dict
         response_json = self.generate_json_response(r, results_json, request_body)
 
@@ -202,7 +206,6 @@ class Base:
 
         return r, results_json
 
-    # {'errors': {'httpStatusCode': 401, 'message': 'HTTP 401 Unauthorized', 'validationErrors': []}, 'response': None, 'timeStamp': '2017-08-24T20:22:48Z'}
     def traffic_types(self, s_type, seat_id=None):
         headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/" + str(s_type)
