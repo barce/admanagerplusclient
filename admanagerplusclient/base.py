@@ -6,81 +6,36 @@ import base64
 
 import sys
 
-# if sys.version_info < (3, 0):
-#     raise "must use python 2.5 or greater"
-
-use_environment_variables = None
-
-try:
-    from django.conf import settings
-except ImportError:
-    use_environment_variables = True
-
 
 class Base:
-    client_id = None
-    client_secret = None
-    id_host = None
-    dsp_host = None
-    request_auth_url = None
-    yahoo_auth = None
-    raw_token_results = None
-    refresh_token = None
-    token = None
-    current_url = ''
-    report_url = ''
-    customerReportId = ''
-    report_results_url = ''
-    headers = None
-    curl_url = None
-    curl_command = None
-    payload = ''
 
     def __init__(self, client_id, client_secret, refresh_token):
 
         self.client_id = client_id
         self.client_secret = client_secret
         self.refresh_token = refresh_token
+
         self.id_host = "https://api.login.yahoo.com"
         self.dsp_host = "https://dspapi.admanagerplus.yahoo.com"
-
         self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
-        self.current_url = ''
         self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
 
-        try:
-            self.raw_token_results = {}
-            self.raw_token_results['refresh_token'] = self.refresh_token
-        except KeyError as e:
-            print("error missing:")
-            print(e)
-
-        self.inventory_payload = None
-
-    def set_refresh_token(self, refresh_token):
-        self.refresh_token = refresh_token
-        self.raw_token_results = {}
-        self.raw_token_results['refresh_token'] = refresh_token
-        return self.refresh_token
-
-    def get_yahoo_auth_url(self):
-        print("Go to this URL:")
-        print(self.request_auth_url)
-
-    def set_yahoo_auth(self, s_auth):
-        self.yahoo_auth = s_auth
-        return self.yahoo_auth
+        self.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': "Basic " + self.base64auth().decode('utf-8'),
+            'X-Auth-Token': None
+        }
 
     def base64auth(self):
         return base64.b64encode((self.client_id + ":" + self.client_secret).encode())
 
     def get_access_token_json(self):
         get_token_url = self.id_host + "/oauth2/get_token"
-        # payload = {'grant_type':'authorization_code', 'redirect_uri':'oob','code':self.yahoo_auth}
         payload = "grant_type=authorization_code&redirect_uri=oob&code=" + self.yahoo_auth
-        # headers = {'Content-Type': 'application/json', 'Authorization': "Basic " + self.base64auth()}
-        headers = {'Content-Type': 'application/x-www-form-urlencoded',
-                   'Authorization': "Basic " + self.base64auth().decode('utf-8')}
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': "Basic " + self.base64auth().decode('utf-8')
+        }
 
         print(get_token_url)
         print(payload)
@@ -94,40 +49,19 @@ class Base:
         get_token_url = self.id_host + "/oauth2/get_token"
         # try to UTF-8 encode refresh token
         try:
-            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results[
-                'refresh_token'].encode('utf-8')
+            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.refresh_token.encode('utf-8')
         except:
-            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.raw_token_results[
-                'refresh_token']
+            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.refresh_token
 
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': "Basic " + self.base64auth().decode('utf-8')
-        }
-        r = requests.post(get_token_url, data=payload, headers=headers)
+        r = requests.post(get_token_url, data=payload, headers=self.headers)
         results_json = r.json()
+        print("ACCESS TOKEN")
+        print(results_json)
         try:
             self.token = results_json['access_token']
         except:
             pass
-        # self.raw_token_results = r.json()
-        # self.refresh_token = self.raw_token_results['refresh_token']
         return results_json
-
-    def cli_auth_dance(self): 
-        self.get_yahoo_auth_url()
-        if sys.version_info < (3, 0):
-            self.yahoo_auth = raw_input("Enter Yahoo! auth code: ")
-        else:
-            self.yahoo_auth = input("Enter Yahoo! auth code: ")
-
-        print("Auth code, {}, entered.".format(self.yahoo_auth))
-        self.raw_token_results = self.get_access_token_json()
-        print("raw_token_results:")
-        print(self.raw_token_results)
-        self.refresh_token = self.raw_token_results['refresh_token']
-        print("refresh_token:")
-        print(self.refresh_token)
 
     #
     #

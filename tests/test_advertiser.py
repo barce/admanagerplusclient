@@ -1,4 +1,5 @@
 import config
+import json
 
 import unittest
 
@@ -10,7 +11,7 @@ class AdvertiserTestCase(unittest.TestCase):
         a = Advertiser(config.client_id, config.client_secret, config.refresh_token)
         a.refresh_access_token()
 
-        advertisers = a.traffic_types('advertisers', 92)
+        advertisers = json.loads(a.traffic_types('advertisers', 92))
 
         print(advertisers)
 
