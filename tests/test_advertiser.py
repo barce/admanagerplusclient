@@ -7,8 +7,13 @@ from admanagerplusclient.connection import Connection
 from admanagerplusclient.advertiser import Advertiser
 
 class AdvertiserTestCase(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.connection = Connection(config.client_id, config.client_secret, config.refresh_token)
+
     def test_get_all_advertisers(self):
-        c = Connection(config.client_id, config.client_secret, config.refresh_token)
+        c = AdvertiserTestCase.connection
         a = Advertiser(c)
 
         advertisers = json.loads(a.get_all(92))
@@ -16,7 +21,7 @@ class AdvertiserTestCase(unittest.TestCase):
         self.assertEqual(advertisers["response_code"], 200)
 
     def test_get_one_advertiser(self):
-        c = Connection(config.client_id, config.client_secret, config.refresh_token)
+        c = AdvertiserTestCase.connection
         a = Advertiser(c)
 
         advertiser = json.loads(a.get_one(25063, 92))
