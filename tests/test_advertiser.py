@@ -11,15 +11,15 @@ class AdvertiserTestCase(unittest.TestCase):
         c = Connection(config.client_id, config.client_secret, config.refresh_token)
         a = Advertiser(c)
 
-        advertisers = json.loads(a.traffic_types('advertisers', 92))
-
+        advertisers = json.loads(a.get_all(92))
+        print(advertisers)
         self.assertEqual(advertisers["response_code"], 200)
 
     def test_get_one_advertiser(self):
         c = Connection(config.client_id, config.client_secret, config.refresh_token)
         a = Advertiser(c)
 
-        advertiser = json.loads(a.traffic_type_by_id('advertisers', 25063, 92))
+        advertiser = json.loads(a.get_one(25063, 92))
 
         print(advertiser)
 

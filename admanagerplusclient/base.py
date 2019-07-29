@@ -27,9 +27,9 @@ class Base:
     #
     #
 
-    def generate_json_response(self, r, results_json, request_body):
+    def generate_json_response(self, r, results_json, data=None):
         response_json = {
-            'request_body': self.curl_command
+            'request_body': self.generate_curl_command(r.request.method, r.url, self.headers, data)
         }
 
         if results_json['errors'] is not None:
@@ -47,21 +47,20 @@ class Base:
 
         return response_json
 
-        # make_request(method_type) --> pass in method_type
 
+    # wraps around make_new_request to test that the token is valid
     def make_request(self, url, headers, method_type, data=None):
-        request_body = url, headers, data
-        r, results_json = self.make_new_request(url, self.connection.token, method_type, headers, data)
+        # request_body = url, headers, data
+        r = self.make_new_request(url, self.connection.token, method_type, headers, data)
+        results_json = r.json()
 
         if results_json['errors'] is not None:
             if results_json['errors']['httpStatusCode'] in [400, 401]:
-                # refresh access token
-                self.token = self.refresh_access_token()['access_token']
-                # apply headers with new token, return response and response dict
-                r, results_json = self.make_new_request(url, self.token, method_type, headers, data)
+                self.connection.token = self.refresh_access_token()['access_token']
+                r = self.make_new_request(url, self.connection.token, method_type, headers, data)
 
         # use results_json to create updated json dict
-        response_json = self.generate_json_response(r, results_json, request_body)
+        response_json = self.generate_json_response(r, results_json, data)
 
         return json.dumps(response_json)
 
@@ -78,20 +77,7 @@ class Base:
             r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
         results_json = r.json()
 
-        command = "curl -v -H {headers} {data} -X {method} {uri}"
-        header_list = ['"{0}: {1}"'.format(k, v) for k, v in headers.items()]
-        header = " -H ".join(header_list)
-        self.curl_command = command.format(method=method_type, headers=header, data=data, uri=url)
-        """
-        print ("===========================")
-        print ("")
-        print (command.format(method=method_type, headers=header, data=data, uri=url))
-        print ("")
-        print ("")
-        print ("================================")
-        """
-
-        return r, results_json
+        return r
 
     def traffic_types(self, s_type, seat_id=None):
         url = self.dsp_host + "/traffic/" + str(s_type)
@@ -144,3 +130,11 @@ class Base:
         url = self.dsp_host + "/traffic/" + str(s_type) + "/?seatId=" + str(seat_id)
         r = self.make_request(url, self.headers, 'POST', payload)
         return r
+
+    def generate_curl_command(self, method, url, headers, data=None):
+        command = "curl -v -H {headers} {data} -X {method} {uri}"
+        
+        header_list = ['"{0}: {1}"'.format(k, v) for k, v in headers.items()]
+        header = " -H ".join(header_list)
+
+        return command.format(method=method, headers=header, data=data, uri=url)
