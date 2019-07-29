@@ -2,8 +2,16 @@ from admanagerplusclient.base import Base
 
 
 class Campaign(Base):
-    def get_all_by_advertiser(self):
-        pass
+    def get_all_by_advertiser(self, advertiser_id, seat_id):
+        url = f"{self.dsp_host}/traffic/campaigns"
+        url += f"/?accountId={advertiser_id}&seatId={str(seat_id)}"
 
-    def get_one_by_campaign_id(self):
-        pass
+        r = self.make_request(url, self.headers, 'GET')
+        return r
+
+    def get_one_by_campaign_id(self, campaign_id, seat_id):
+        url = f"{self.dsp_host}/traffic/campaigns/{str(campaign_id)}"
+        url += "/?seatId=" + str(seat_id)
+
+        r = self.make_request(url, self.headers, 'GET')
+        return r

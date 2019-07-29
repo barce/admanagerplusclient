@@ -50,7 +50,6 @@ class Base:
 
     # wraps around make_new_request to test that the token is valid
     def make_request(self, url, headers, method_type, data=None):
-        # request_body = url, headers, data
         r = self.make_new_request(url, self.connection.token, method_type, headers, data)
         results_json = r.json()
 
@@ -75,7 +74,6 @@ class Base:
             r = requests.post(url, headers=self.headers, verify=False, data=json.dumps(data))
         if method_type == 'PUT':
             r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
-        results_json = r.json()
 
         return r
 
