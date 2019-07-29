@@ -66,10 +66,6 @@ class Base:
         return json.dumps(response_json)
 
     def make_new_request(self, url, token, method_type, headers, data=None):
-        #print ("URL")
-        #print (url)
-        #print ("DATA")
-        #print (data)
 
         # modify headers with new access token
         self.headers['X-Auth-Token'] = token
@@ -82,8 +78,6 @@ class Base:
             r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
         results_json = r.json()
 
-        #print ("results_json")
-        #print (results_json)
         command = "curl -v -H {headers} {data} -X {method} {uri}"
         header_list = ['"{0}: {1}"'.format(k, v) for k, v in headers.items()]
         header = " -H ".join(header_list)
@@ -112,8 +106,6 @@ class Base:
     def traffic_type_by_id(self, s_type, cid, seat_id):
         url = self.dsp_host + "/traffic/" + str(s_type)
         url = url + "/" + str(cid) + "/?seatId=" + str(seat_id)
-        # self.curl_url = url
-        # self.debug_curl()
 
         r = self.make_request(url, self.headers, 'GET')
         return r

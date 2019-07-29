@@ -11,7 +11,7 @@ class AdvertiserTestCase(unittest.TestCase):
         c = Connection(config.client_id, config.client_secret, config.refresh_token)
         a = Advertiser(c)
 
-        advertisers = json.loads(a.traffic_types('advertisers', 861))
+        advertisers = json.loads(a.traffic_types('advertisers', 92))
 
         print(advertisers)
 
