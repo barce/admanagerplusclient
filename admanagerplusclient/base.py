@@ -2,66 +2,24 @@
 
 import json
 import requests
-import base64
 
-import sys
+from admanagerplusclient.connection import Connection
 
 
 class Base:
 
-    def __init__(self, client_id, client_secret, refresh_token):
+    def __init__(self, connection):
+        
+        self.connection = connection
 
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.refresh_token = refresh_token
-
-        self.id_host = "https://api.login.yahoo.com"
         self.dsp_host = "https://dspapi.admanagerplus.yahoo.com"
-        self.request_auth_url = self.id_host + "/oauth2/request_auth?client_id=" + self.client_id + "&redirect_uri=oob&response_type=code&language=en-us"
         self.report_url = 'https://api-sched-v3.admanagerplus.yahoo.com/yamplus_api/extreport/'
 
         self.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': "Basic " + self.base64auth().decode('utf-8'),
-            'X-Auth-Token': None
+            'Content-Type': 'application/json',
+            'X-Auth-Method': 'OAUTH',
+            'X-Auth-Token': str(self.connection.token)
         }
-
-    def base64auth(self):
-        return base64.b64encode((self.client_id + ":" + self.client_secret).encode())
-
-    def get_access_token_json(self):
-        get_token_url = self.id_host + "/oauth2/get_token"
-        payload = "grant_type=authorization_code&redirect_uri=oob&code=" + self.yahoo_auth
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': "Basic " + self.base64auth().decode('utf-8')
-        }
-
-        print(get_token_url)
-        print(payload)
-        print(headers)
-
-        r = requests.post(get_token_url, data=payload, headers=headers)
-        results_json = r.json()
-        return results_json
-
-    def refresh_access_token(self):
-        get_token_url = self.id_host + "/oauth2/get_token"
-        # try to UTF-8 encode refresh token
-        try:
-            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.refresh_token.encode('utf-8')
-        except:
-            payload = "grant_type=refresh_token&redirect_uri=oob&refresh_token=" + self.refresh_token
-
-        r = requests.post(get_token_url, data=payload, headers=self.headers)
-        results_json = r.json()
-        print("ACCESS TOKEN")
-        print(results_json)
-        try:
-            self.token = results_json['access_token']
-        except:
-            pass
-        return results_json
 
     #
     #
@@ -93,7 +51,7 @@ class Base:
 
     def make_request(self, url, headers, method_type, data=None):
         request_body = url, headers, data
-        r, results_json = self.make_new_request(url, self.token, method_type, headers, data)
+        r, results_json = self.make_new_request(url, self.connection.token, method_type, headers, data)
 
         if results_json['errors'] is not None:
             if results_json['errors']['httpStatusCode'] in [400, 401]:
@@ -114,13 +72,14 @@ class Base:
         #print (data)
 
         # modify headers with new access token
-        headers['X-Auth-Token'] = token
+        self.headers['X-Auth-Token'] = token
+
         if method_type == 'GET':
-            r = requests.get(url, headers=headers)
+            r = requests.get(url, headers=self.headers)
         if method_type == 'POST':
-            r = requests.post(url, headers=headers, verify=False, data=json.dumps(data))
+            r = requests.post(url, headers=self.headers, verify=False, data=json.dumps(data))
         if method_type == 'PUT':
-            r = requests.put(url, headers=headers, verify=False, data=json.dumps(data))
+            r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
         results_json = r.json()
 
         #print ("results_json")
@@ -141,31 +100,27 @@ class Base:
         return r, results_json
 
     def traffic_types(self, s_type, seat_id=None):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/" + str(s_type)
         if seat_id is not None:
             url += "/?seatId=" + str(seat_id)
 
-        r = self.make_request(url, headers, 'GET')
+        r = self.make_request(url, self.headers, 'GET')
         return r
 
     # Works for s_types:
     # advertisers, campaigns, lines
     def traffic_type_by_id(self, s_type, cid, seat_id):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
-        self.headers = headers
         url = self.dsp_host + "/traffic/" + str(s_type)
         url = url + "/" + str(cid) + "/?seatId=" + str(seat_id)
         # self.curl_url = url
         # self.debug_curl()
 
-        r = self.make_request(url, headers, 'GET')
+        r = self.make_request(url, self.headers, 'GET')
         return r
 
     # TODO:
     # do not pass to the results string if not set on our end
     def traffic_types_by_filter(self, s_type, account_id, page=0, limit=0, sort='', direction='asc', query=''):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/" + str(s_type)
         if s_type == 'lines':
             url = url + "?orderId=" + str(account_id)
@@ -182,20 +137,18 @@ class Base:
             url = url + "&query=" + str(query)
         url = url + "&dir=" + str(direction)
 
-        r = self.make_request(url, headers, 'GET')
+        r = self.make_request(url, self.headers, 'GET')
         r = json.loads(r)
         r['data']['response'] = r['data']['response'][0]
         r = json.dumps(r)
         return r
 
     def update_traffic_type(self, s_type, cid, payload, seat_id):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid) + "/?seatId=" + str(seat_id)
-        r = self.make_request(url, headers, 'PUT', payload)
+        r = self.make_request(url, self.headers, 'PUT', payload)
         return r
 
     def create_traffic_type(self, s_type, payload, seat_id):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/" + str(s_type) + "/?seatId=" + str(seat_id)
-        r = self.make_request(url, headers, 'POST', payload)
+        r = self.make_request(url, self.headers, 'POST', payload)
         return r
