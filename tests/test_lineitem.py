@@ -19,10 +19,10 @@ class LineItemTestCase(unittest.TestCase):
 
         self.assertEqual(lines["response_code"], 200)
 
-    def test_get_one_campaign(self):
+    def test_get_one_lineitem(self):
         l = LineItem(LineItemTestCase.connection)
 
-        line = json.loads(l.get_line_by_line_id(376875, 92))
+        line = json.loads(l.get_one(376875, 92))
         print(line)
 
         self.assertEqual(line["response_code"], 200)

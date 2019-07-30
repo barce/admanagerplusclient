@@ -22,7 +22,7 @@ class CampaignTestCase(unittest.TestCase):
     def test_get_one_campaign(self):
         c = Campaign(CampaignTestCase.connection)
 
-        campaign = json.loads(c.get_one_by_campaign_id(97893, 92))
+        campaign = json.loads(c.get_one(97893, 92))
         print(campaign)
 
         self.assertEqual(campaign["response_code"], 200)
