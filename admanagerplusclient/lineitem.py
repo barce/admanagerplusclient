@@ -1,5 +1,21 @@
+from admanagerplusclient.base import Base
 
-class LineItem:
+
+class LineItem(Base):
+    def get_lines_by_campaign_id(self, campaign_id, seat_id):
+        url = f"{self.dsp_host}/traffic/lines"
+        url += f"/?orderId={campaign_id}&seatId={str(seat_id)}"
+
+        r = self.make_request(url, self.headers, 'GET')
+        return r
+
+    def get_line_by_line_id(self, line_id, seat_id):
+        url = f"{self.dsp_host}/traffic/lines/{str(line_id)}"
+        url += "/?seatId=" + str(seat_id)
+
+        r = self.make_request(url, self.headers, 'GET')
+        return r
+
     def set_inventory_payload(self, dsp_lineitem_id):
         self.dsp_lineitem_id = dsp_lineitem_id
 
@@ -60,7 +76,6 @@ class LineItem:
         )
 
     def update_inventory(self, seat_id):
-        headers = {'Content-Type': 'application/json', 'X-Auth-Method': 'OAUTH', 'X-Auth-Token': str(self.token)}
         url = self.dsp_host + "/traffic/lines/{0}/targeting?seatId={1}".format(int(self.dsp_lineitem_id), seat_id)
-        r = self.make_request(url, headers, 'POST', self.inventory_payload)
+        r = self.make_request(url, self.headers, 'POST', self.inventory_payload)
         return r
