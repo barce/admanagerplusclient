@@ -5,7 +5,7 @@ setup(
     version='0.9.2',
     author='Jim Barcelona',
     author_email='barce@me.com',
-    packages=['admanagerplusclient', 'admanagerplusclient.tests'],
+    packages=['admanagerplusclient'],
     install_requires=[
       'future',
     ],
