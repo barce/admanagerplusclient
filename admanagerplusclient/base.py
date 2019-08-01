@@ -47,8 +47,6 @@ class Base:
 
         return response_json
 
-
-    # wraps around make_new_request to test that the token is valid
     def make_request(self, url, headers, method_type, data=None):
 
         if method_type == 'GET':
@@ -85,41 +83,6 @@ class Base:
         url = url + "/" + str(cid) + "/?seatId=" + str(seat_id)
 
         r = self.make_request(url, self.headers, 'GET')
-        return r
-
-    # TODO:
-    # do not pass to the results string if not set on our end
-    def traffic_types_by_filter(self, s_type, account_id, page=0, limit=0, sort='', direction='asc', query=''):
-        url = self.dsp_host + "/traffic/" + str(s_type)
-        if s_type == 'lines':
-            url = url + "?orderId=" + str(account_id)
-        else:
-            url = url + "?accountId=" + str(account_id)
-
-        if page > 0:
-            url = url + "&page=" + str(page)
-        if limit > 0:
-            url = url + "&limit=" + str(limit)
-        if sort != '':
-            url = url + "&sort=" + str(sort)
-        if query != '':
-            url = url + "&query=" + str(query)
-        url = url + "&dir=" + str(direction)
-
-        r = self.make_request(url, self.headers, 'GET')
-        r = json.loads(r)
-        r['data']['response'] = r['data']['response'][0]
-        r = json.dumps(r)
-        return r
-
-    def update_traffic_type(self, s_type, cid, payload, seat_id):
-        url = self.dsp_host + "/traffic/" + str(s_type) + "/" + str(cid) + "/?seatId=" + str(seat_id)
-        r = self.make_request(url, self.headers, 'PUT', payload)
-        return r
-
-    def create_traffic_type(self, s_type, payload, seat_id):
-        url = self.dsp_host + "/traffic/" + str(s_type) + "/?seatId=" + str(seat_id)
-        r = self.make_request(url, self.headers, 'POST', payload)
         return r
 
     def generate_curl_command(self, method, url, headers, data=None):
