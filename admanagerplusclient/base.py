@@ -50,7 +50,14 @@ class Base:
 
     # wraps around make_new_request to test that the token is valid
     def make_request(self, url, headers, method_type, data=None):
-        r = self.make_new_request(url, self.connection.token, method_type, headers, data)
+
+        if method_type == 'GET':
+            r = requests.get(url, headers=self.headers)
+        if method_type == 'POST':
+            r = requests.post(url, headers=self.headers, verify=False, data=json.dumps(data))
+        if method_type == 'PUT':
+            r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
+
         results_json = r.json()
 
         if results_json['errors'] is not None:
@@ -62,20 +69,6 @@ class Base:
         response_json = self.generate_json_response(r, results_json, data)
 
         return json.dumps(response_json)
-
-    def make_new_request(self, url, token, method_type, headers, data=None):
-
-        # modify headers with new access token
-        self.headers['X-Auth-Token'] = token
-
-        if method_type == 'GET':
-            r = requests.get(url, headers=self.headers)
-        if method_type == 'POST':
-            r = requests.post(url, headers=self.headers, verify=False, data=json.dumps(data))
-        if method_type == 'PUT':
-            r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
-
-        return r
 
     def traffic_types(self, s_type, seat_id=None):
         url = self.dsp_host + "/traffic/" + str(s_type)
