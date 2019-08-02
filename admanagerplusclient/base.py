@@ -21,12 +21,6 @@ class Base:
             'X-Auth-Token': str(self.connection.token)
         }
 
-    #
-    #
-    # traffic types
-    #
-    #
-
     def generate_json_response(self, r, results_json, data=None):
         response_json = {
             'request_body': self.generate_curl_command(r.request.method, r.url, self.headers, data)
@@ -47,14 +41,14 @@ class Base:
 
         return response_json
 
-    def make_request(self, url, headers, method_type, data=None):
+    def make_request(self, url, headers, method_type, params=None, data=None):
 
         if method_type == 'GET':
-            r = requests.get(url, headers=self.headers)
+            r = requests.get(url, params=params, headers=self.headers)
         if method_type == 'POST':
-            r = requests.post(url, headers=self.headers, verify=False, data=json.dumps(data))
+            r = requests.post(url, headers=self.headers, verify=False, params=params, data=json.dumps(data))
         if method_type == 'PUT':
-            r = requests.put(url, headers=self.headers, verify=False, data=json.dumps(data))
+            r = requests.put(url, headers=self.headers, verify=False, params=params, data=json.dumps(data))
 
         results_json = r.json()
 
