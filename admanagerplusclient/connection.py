@@ -26,7 +26,7 @@ class Connection:
             "refresh_token": self.refresh_token.encode('utf-8')
         }
 
-        r = requests.post(get_token_url, data=payload, headers=self.headers)
+        r = requests.post(get_token_url, data=payload, headers=self.headers, verify=False) # CHANGE THIS BACK AFTER TESTING
         results_json = r.json()
         try:
             self.token = results_json['access_token']
