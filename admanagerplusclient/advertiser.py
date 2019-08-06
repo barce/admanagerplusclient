@@ -48,7 +48,7 @@ class Advertiser(Base):
 
 
     def get_one(self, advertiser_id, seat_id):
-        url = f"{self.dsp_host}/traffic/advertisers/{str(advertiser_id)}"
+        url = f"{self.dsp_host}/traffic/advertisers/{str(advertiser_id)}/"
         params = {
             "seatId": str(seat_id)
         }

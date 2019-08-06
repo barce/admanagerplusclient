@@ -46,7 +46,7 @@ class Campaign(Base):
         return json.dumps(response)
 
     def get_one(self, campaign_id, seat_id):
-        url = f"{self.dsp_host}/traffic/campaigns/{str(campaign_id)}"
+        url = f"{self.dsp_host}/traffic/campaigns/{str(campaign_id)}/"
         params = {
             "seatId": str(seat_id)
         }

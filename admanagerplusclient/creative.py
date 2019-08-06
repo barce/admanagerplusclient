@@ -47,7 +47,7 @@ class Creative(Base):
         return json.dumps(response)
 
     def get_one(self, creative_id, seat_id):
-        url = f"{self.dsp_host}/traffic/ads/{str(creative_id)}"
+        url = f"{self.dsp_host}/traffic/ads/{str(creative_id)}/"
         params = {
             "seatId": str(seat_id)
         }
