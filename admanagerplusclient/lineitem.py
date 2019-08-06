@@ -82,27 +82,6 @@ class LineItem(Base):
             "types": []
         }
 
-    def set_sitelists(self, add_site_list_ids, remove_site_list_ids=[]):
-        site_list_data = []
-        for id in add_site_list_ids:
-            rval = {
-                "excluded": False,
-                "entityId": int(id)
-            }
-            site_list_data.append(rval)
-
-        self.inventory_payload["siteLists"] = {
-            "removed": remove_site_list_ids,
-            "clearAll": False,
-            "added": site_list_data
-        }
-        self.inventory_payload["types"].append(
-            {
-                "name": "SITE_LISTS",
-                "isTargeted": True
-            }
-        )
-
     def set_deals(self, deal_ids):
         add_deal_ids = []
         for id in deal_ids:
