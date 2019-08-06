@@ -54,8 +54,22 @@ class Campaign(Base):
         r = self.make_request(url, self.headers, 'GET', params=params)
         return r
 
-    def create_one(self):
-        pass
+    def create_one(self, data, seat_id):
+        url = f"{self.dsp_host}/traffic/campaigns/"
+        params = {
+            "seatId": str(seat_id)
+        }
 
-    def update_one(self):
-        pass
+        r = self.make_request(url, self.headers, 'POST', params=params, data=data)
+
+        return r
+
+    def update_one(self, campaign_id, data, seat_id):
+        url = f"{self.dsp_host}/traffic/campaigns/{str(campaign_id)}/"
+        params = {
+            "seatId": str(seat_id)
+        }
+
+        r = self.make_request(url, self.headers, 'PUT', params=params, data=data)
+
+        return r
