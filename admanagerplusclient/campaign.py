@@ -4,7 +4,7 @@ from admanagerplusclient.base import Base
 
 class Campaign(Base):
     def get_all_by_advertiser(self, advertiser_id, seat_id):
-        endpoint = f"{self.dsp_host}/traffic/campaigns"
+        endpoint = f"{self.dsp_host}/traffic/campaigns/"
         campaigns = []
         params = {
             "accountId": advertiser_id,

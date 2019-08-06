@@ -5,7 +5,7 @@ from admanagerplusclient.base import Base
 
 class LineItem(Base):
     def get_lines_by_campaign_id(self, campaign_id, seat_id):
-        endpoint = f"{self.dsp_host}/traffic/lines"
+        endpoint = f"{self.dsp_host}/traffic/lines/"
         line_items = []
         params = {
             "orderId": campaign_id,

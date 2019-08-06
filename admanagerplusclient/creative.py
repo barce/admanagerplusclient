@@ -5,7 +5,7 @@ from admanagerplusclient.base import Base
 
 class Creative(Base):
     def get_creatives_by_lineitem(self, lineitem_id, seat_id):
-        endpoint = f"{self.dsp_host}/traffic/ads"
+        endpoint = f"{self.dsp_host}/traffic/ads/"
         creatives = []
         params = {
             "lineId": lineitem_id,

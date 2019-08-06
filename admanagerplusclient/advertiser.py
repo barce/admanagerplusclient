@@ -6,7 +6,7 @@ from admanagerplusclient.base import Base
 class Advertiser(Base):
     
     def get_all(self, seat_id):
-        endpoint = f"{self.dsp_host}/traffic/advertisers"
+        endpoint = f"{self.dsp_host}/traffic/advertisers/"
         advertisers = []
         params = {
             "seatId": str(seat_id),
