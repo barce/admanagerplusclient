@@ -5,10 +5,6 @@ from admanagerplusclient.base import Base
 class Campaign(Base):
     def get_all_by_advertiser(self, advertiser_id, seat_id):
         endpoint = f"{self.dsp_host}/traffic/campaigns"
-
-        r = self.make_request(url, self.headers, 'GET')
-        return r
-
         campaigns = []
         params = {
             "accountId": advertiser_id,
@@ -51,9 +47,11 @@ class Campaign(Base):
 
     def get_one(self, campaign_id, seat_id):
         url = f"{self.dsp_host}/traffic/campaigns/{str(campaign_id)}"
-        url += "/?seatId=" + str(seat_id)
+        params = {
+            "seatId": str(seat_id)
+        }
 
-        r = self.make_request(url, self.headers, 'GET')
+        r = self.make_request(url, self.headers, 'GET', params=params)
         return r
 
     def create_one(self):
