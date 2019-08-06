@@ -1,20 +1,65 @@
+import json
+
 from admanagerplusclient.base import Base
 
 
 class LineItem(Base):
     def get_lines_by_campaign_id(self, campaign_id, seat_id):
-        url = f"{self.dsp_host}/traffic/lines"
-        url += f"/?orderId={campaign_id}&seatId={str(seat_id)}"
+        endpoint = f"{self.dsp_host}/traffic/lines"
+        line_items = []
+        params = {
+            "orderId": campaign_id,
+            "seatId": str(seat_id),
+            "limit": 100,
+            "page": 0
+        }
 
-        r = self.make_request(url, self.headers, 'GET')
-        return r
+        while True:
+            params["page"] += 1
+            expected_total = params["page"] * params["limit"]
+
+            response = json.loads(self.make_request(endpoint, self.headers, 'GET', params=params))
+
+            if response.get('msg_type') == "error":
+                for error in response.get('data').get('validationErrors'):
+                    if error.get('propertyName') == "TRAFFIC_LIMIT_PER_MIN":
+                        print("")
+                        print("")
+                        print("")
+                        print("Traffic Limit Exceeded Sleeping...")
+                        time.sleep(61)
+                        print("")
+                        print("")
+                        print("")
+
+                        response = json.loads(self.make_request(endpoint, self.headers, 'GET', params=params))
+
+            if response.get('msg_type') == "success":
+                for line_item in response.get('data').get('response'):
+                    line_items.append(line_item)
+
+            if int(len(line_items)) != int(expected_total):
+                print('we have ' + str(len(line_items)))
+                break
+
+        response['data'] = line_items
+
+        return json.dumps(response)
 
     def get_one(self, line_id, seat_id):
-        url = f"{self.dsp_host}/traffic/lines/{str(line_id)}"
-        url += "/?seatId=" + str(seat_id)
+        url = f"{self.dsp_host}/traffic/lines/{str(line_id)}/"
+        params = {
+            "seatId": str(seat_id)
+        }
 
-        r = self.make_request(url, self.headers, 'GET')
+        r = self.make_request(url, self.headers, 'GET', params=params)
         return r
+
+    def create_one(self):
+        pass
+
+    def update_one(self):
+        pass    
 
     def set_inventory_payload(self, dsp_lineitem_id):
         self.dsp_lineitem_id = dsp_lineitem_id
