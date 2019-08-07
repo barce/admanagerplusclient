@@ -170,5 +170,5 @@ class LineItem(Base):
 
     def update_inventory(self, seat_id):
         url = self.dsp_host + "/traffic/lines/{0}/targeting?seatId={1}".format(int(self.dsp_lineitem_id), seat_id)
-        r = self.make_request(url, self.headers, 'POST', self.inventory_payload)
+        r = self.make_request(url, self.headers, 'POST', data=self.inventory_payload)
         return r
