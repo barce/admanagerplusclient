@@ -1,4 +1,6 @@
 # admanagerplustclient
+WARNING: This code no longer works since Yahoo shuttered its SSP.
+
 A python API client for Yahoo's Ad Manager Plus (formerly Brightroll Ad DSP)
 
 # example for 1st time use
